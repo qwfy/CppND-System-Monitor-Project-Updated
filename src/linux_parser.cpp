@@ -143,11 +143,53 @@ LinuxParser::CPUStat LinuxParser::CpuUtilization() {
     return stat;
 }
 
-// TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+// TODO DONE: Read and return the total number of processes
+int LinuxParser::TotalProcesses() {
+    int total_processes = 0;
+    std::ifstream f("/proc/stat");
+    if (f.is_open()) {
+        std::string line;
+        std::string first;
+        int second;
+        while (std::getline(f, line)) {
+            std::stringstream line_stream(line);
+            if (line_stream >> first >> second) {
+                if (first == "processes") {
+                    total_processes = second;
+                    break;
+                }
+            }
+        }
+    } else {
+        std::cerr << "Cannot parse /proc/stat for total processes" << std::endl;
+    }
 
-// TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses() { return 0; }
+    return total_processes;
+}
+
+// TODO DONE: Read and return the number of running processes
+int LinuxParser::RunningProcesses() {
+    int running_processes = 0;
+    std::ifstream f("/proc/stat");
+    if (f.is_open()) {
+        std::string line;
+        std::string first;
+        int second;
+        while (std::getline(f, line)) {
+            std::stringstream line_stream(line);
+            if (line_stream >> first >> second) {
+                if (first == "procs_running") {
+                    running_processes = second;
+                    break;
+                }
+            }
+        }
+    } else {
+        std::cerr << "Cannot parse /proc/stat for running processes" << std::endl;
+    }
+
+    return running_processes;
+}
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
