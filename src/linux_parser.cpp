@@ -67,8 +67,33 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+// TODO DONE: Read and return the system memory utilization
+float LinuxParser::MemoryUtilization() {
+    std::ifstream f("/proc/meminfo");
+    string total_line, _free_line, available_line;
+    int total = 0;
+    int available = 0;
+    string ph;
+
+    float utilization = 0;
+    if (f.is_open()) {
+        std::getline(f, total_line);
+        std::getline(f, _free_line);
+        std::getline(f, available_line);
+        std::stringstream total_stream(total_line);
+        std::stringstream available_stream(available_line);
+        total_stream >> ph >> total;
+        available_stream >> ph >> available;
+        if (total > 0) {
+            utilization = (float)(total - available) / (float)total;
+        } else {
+            std::cerr << "Cannot parse /proc/meminfo for memory utilization 3" << std::endl;
+        }
+    } else {
+        std::cerr << "Cannot parse /proc/meminfo for memory utilization 1" << std::endl;
+    }
+    return utilization;
+}
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { return 0; }
